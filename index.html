@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efek Cursor</title>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="Efek Cursor"></canvas>
+
+    <script>
+        const canvas = document.getElementById('galaxyCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        class Particle {
+            constructor(x, y, isExplosion = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 10 + 3;
+                this.speedX = (Math.random() - 0.5) * 4;
+                this.speedY = Math.random() * -3 - 1;
+                this.opacity = 1;
+                this.angle = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 4;
+                this.isExplosion = isExplosion;
+
+                // Warna galaxy maskulin: biru tua, cyan, hijau neon, ungu gelap
+                const colors = [
+                    `rgba(0, ${Math.random() * 100 + 150}, 255, 1)`, // Cyan terang
+                    `rgba(0, 50, ${Math.random() * 155 + 100}, 1)`, // Biru tua
+                    `rgba(50, 255, 50, 1)`, // Hijau neon
+                    `rgba(100, 0, ${Math.random() * 155 + 100}, 1)`, // Ungu gelap
+                    `rgba(255, 255, 255, 1)` // Putih (bintang)
+                ];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size *= 0.96;
+                this.opacity -= 0.02;
+                this.angle += this.spin;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 30; // Glow lebih kuat
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function addGalaxy(event, isExplosion = false) {
+            let numParticles = isExplosion ? 40 : 15;
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle(event.clientX, event.clientY, isExplosion));
+            }
+        }
+
+        function animateGalaxy() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.size > 1 && p.opacity > 0);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animateGalaxy);
+        }
+
+        window.addEventListener('mousemove', (e) => addGalaxy(e));
+        window.addEventListener('click', (e) => addGalaxy(e, true));
+        animateGalaxy();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
