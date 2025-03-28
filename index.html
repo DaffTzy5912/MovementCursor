@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Efek Cursos</title>
+    <title>Efek Galaxy Maskulin</title>
     <style>
         body {
             background: black;
@@ -14,21 +14,24 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-    <canvas id="Efek Cursor"></canvas>
+    <canvas id="galaxyCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('galaxyCanvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
         let particles = [];
 
@@ -44,7 +47,7 @@
                 this.spin = (Math.random() - 0.5) * 4;
                 this.isExplosion = isExplosion;
 
-                // Warna galaxy maskulin: biru tua, cyan, hijau neon, ungu gelap
+                // Warna efek galaxy maskulin
                 const colors = [
                     `rgba(0, ${Math.random() * 100 + 150}, 255, 1)`, // Cyan terang
                     `rgba(0, 50, ${Math.random() * 155 + 100}, 1)`, // Biru tua
@@ -58,8 +61,8 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                this.size *= 0.96;
-                this.opacity -= 0.02;
+                this.size *= 0.98; // Perlahan mengecil lebih halus
+                this.opacity -= 0.008; // Opacity lebih lambat berkurang
                 this.angle += this.spin;
             }
 
@@ -69,14 +72,14 @@
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
                 ctx.shadowColor = this.color;
-                ctx.shadowBlur = 30; // Glow lebih kuat
+                ctx.shadowBlur = 20; // Glow lebih halus
                 ctx.fill();
                 ctx.globalAlpha = 1;
             }
         }
 
         function addGalaxy(event, isExplosion = false) {
-            let numParticles = isExplosion ? 40 : 15;
+            let numParticles = isExplosion ? 50 : 20; // Tambah jumlah partikel saat klik
             for (let i = 0; i < numParticles; i++) {
                 particles.push(new Particle(event.clientX, event.clientY, isExplosion));
             }
@@ -94,14 +97,11 @@
             requestAnimationFrame(animateGalaxy);
         }
 
+        // Event untuk efek ketika mouse bergerak dan klik
         window.addEventListener('mousemove', (e) => addGalaxy(e));
         window.addEventListener('click', (e) => addGalaxy(e, true));
-        animateGalaxy();
 
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+        animateGalaxy();
     </script>
 </body>
 </html>
